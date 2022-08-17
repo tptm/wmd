@@ -14,25 +14,62 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  password Password?
-  notes    Note[]
+  password    Password?
+  Tasks       Task[]
+  userState   UserState?
 }
 
 model Password {
   hash String
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 }
 
-model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
+model UserState {
+  id  Int @id @default(autoincrement())
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dayTop Task? @relation("Day top", fields: [dayTopId], references: [id])
+  weekTop Task? @relation("Week top", fields: [weekTopId], references: [id])
+  backlogTop Task? @relation("Backlog top", fields: [backlogTopId], references: [id])
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId  String @unique
+  dayTopId Int? @unique
+  weekTopId Int? @unique
+  backlogTopId Int? @unique
+}
+
+model Task {
+  id      Int @id @default(autoincrement())
+  title   String
+  comment String?
+  status  String // @todo make enum
+
+  upstackId Int?  @unique
+  upstack   Task?   @relation("Priority", fields: [upstackId], references: [id])
+  downstack Task?   @relation("Priority")
+
+  dayTopUserState   UserState?  @relation("Day top")
+  weekTopUserState  UserState?  @relation("Week top")
+  backlogTopUserState   UserState?  @relation("Backlog top")
+
+  topSubtask    SubTask? @relation(fields: [topSubtaskId], references: [id], onDelete: NoAction)
+  topSubtaskId  Int?     @unique
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+}
+
+model SubTask {
+  id      Int @id @default(autoincrement())
+  title   String
+  comment String?
+  status  String // @todo make enum
+
+  upstackId Int?  @unique
+  upstack   SubTask?   @relation("Priority2", fields: [upstackId], references: [id])
+  downstack SubTask?   @relation("Priority2")
+
+  parentTask  Task?
 }
