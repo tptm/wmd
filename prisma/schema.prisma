@@ -14,9 +14,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  todayTopTaskId Int? @unique
+  todayTop Task? @relation("Today top", fields: [todayTopTaskId], references: [id]) 
+  upnextTopTaskId Int? @unique
+  upnextTop Task? @relation("Upnext top", fields: [upnextTopTaskId], references: [id]) 
+  backlogTopTaskId Int? @unique
+  backlogTop Task? @relation("Backlog top", fields: [backlogTopTaskId], references: [id]) 
+
   password    Password?
-  Tasks       Task[]
-  userState   UserState?
+  tasks       Task[]
 }
 
 model Password {
@@ -26,50 +32,35 @@ model Password {
   userId String @unique
 }
 
-model UserState {
-  id  Int @id @default(autoincrement())
-
-  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dayTop Task? @relation("Day top", fields: [dayTopId], references: [id])
-  weekTop Task? @relation("Week top", fields: [weekTopId], references: [id])
-  backlogTop Task? @relation("Backlog top", fields: [backlogTopId], references: [id])
-
-  userId  String @unique
-  dayTopId Int? @unique
-  weekTopId Int? @unique
-  backlogTopId Int? @unique
-}
-
 model Task {
-  id      Int @id @default(autoincrement())
-  title   String
+  id Int @id @default(autoincrement())
+
+  title String
   comment String?
-  status  String // @todo make enum
-
-  upstackId Int?  @unique
-  upstack   Task?   @relation("Priority", fields: [upstackId], references: [id])
-  downstack Task?   @relation("Priority")
-
-  dayTopUserState   UserState?  @relation("Day top")
-  weekTopUserState  UserState?  @relation("Week top")
-  backlogTopUserState   UserState?  @relation("Backlog top")
-
-  topSubtask    SubTask? @relation(fields: [topSubtaskId], references: [id], onDelete: NoAction)
-  topSubtaskId  Int?     @unique
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status Int @default(0) // 0 - to do, 1 - done, 2 - rejected
+  prevId Int? @unique
+  list Int @default(0) // 0 - today, 1 - upnext, 2 - backlog
+  topSubtaskId Int? @unique
   userId String
+
+  prev Task? @relation("Priority", fields: [prevId], references: [id])
+  next Task? @relation("Priority")
+  topSubtask SubTask? @relation(fields: [topSubtaskId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  todayTopForUser User? @relation("Today top")
+  upnextTopForUser User? @relation("Upnext top")
+  backlogTopForUser User? @relation("Backlog top")
 }
 
 model SubTask {
-  id      Int @id @default(autoincrement())
-  title   String
+  id Int @id @default(autoincrement())
+  
+  title String
   comment String?
-  status  String // @todo make enum
+  status Int // 0 - to do, 1 - done, 2 - rejected
+  prevId Int?  @unique
 
-  upstackId Int?  @unique
-  upstack   SubTask?   @relation("Priority2", fields: [upstackId], references: [id])
-  downstack SubTask?   @relation("Priority2")
-
+  prev   SubTask?   @relation("Priority2", fields: [prevId], references: [id])
+  next SubTask?   @relation("Priority2")
   parentTask  Task?
 }
