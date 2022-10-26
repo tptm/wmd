@@ -2,6 +2,7 @@
 // @todo operations history
 // @todo get rid of auth dedicated urls
 // @todo update schema, seed
+// @todo catch errors
 
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";

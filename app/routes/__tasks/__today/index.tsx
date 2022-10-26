@@ -21,5 +21,6 @@ export default function TodayPage() {
             <li>{task.id} &nbsp; {task.title}</li>
         )}
     </ul>
+    
  );
 }

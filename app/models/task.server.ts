@@ -17,8 +17,16 @@ export function getTask({
 }
 
 export function getTaskListItems({ userId }: { userId: User["id"] }) {
-  return prisma.task.findMany({
-    where: { userId },
-    select: { id: true, title: true }
-  });
+  const result = prisma.$queryRaw<Task[]>`
+    WITH RECURSIVE priority(prevId) AS (
+      SELECT todayTopTaskId from User WHERE User.id=${userId}
+      UNION
+      SELECT Task.prevId FROM Task, priority
+        WHERE priority.prevId=Task.id
+        LIMIT 3
+    )
+    SELECT Task.* FROM priority, Task
+      WHERE priority.prevId = Task.id;
+  `;
+  return result;
 }

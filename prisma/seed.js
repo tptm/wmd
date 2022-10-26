@@ -24,21 +24,21 @@ async function seed() {
     },
   });
 
-  // const verbs = ['Do', 'Make', 'Paint', 'Buy', 'Say', 'Pick', 'Decide on'];
-  // const nouns = ['Block', 'Stand', 'Guitar', 'Mind', 'Light', 'Phone', 'Ashley'];
+  const verbs = ['Do', 'Make', 'Paint', 'Buy', 'Say', 'Pick', 'Decide on'];
+  const nouns = ['Block', 'Stand', 'Guitar', 'Mind', 'Light', 'Phone', 'Ashley'];
   
-  // let prevId = null;
+  let prevId = null;
 
-  // for (let i = 0; i < 8; i++) {
-  //   const task = await prisma.task.create({
-  //     data: {
-  //       title: `${verbs[Math.floor(Math.random() * 7)]} ${nouns[Math.floor(Math.random() * 7)]}`,
-  //       prevId,
-  //       userId: user.id,
-  //     }
-  //   })
-  //   prevId = task.id;
-  // }
+  for (let i = 0; i < 8; i++) {
+    const task = await prisma.task.create({
+      data: {
+        title: `${verbs[Math.floor(Math.random() * 7)]} ${nouns[Math.floor(Math.random() * 7)]}`,
+        prevId,
+        userId: user.id,
+      }
+    })
+    prevId = task.id;
+  }
 
   console.log(`Database has been seeded. 🌱`);
 }
