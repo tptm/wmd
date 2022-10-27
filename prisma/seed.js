@@ -28,17 +28,27 @@ async function seed() {
   const nouns = ['Block', 'Stand', 'Guitar', 'Mind', 'Light', 'Phone', 'Ashley'];
   
   let prevId = null;
+  let topTask;
 
   for (let i = 0; i < 8; i++) {
-    const task = await prisma.task.create({
+    topTask = await prisma.task.create({
       data: {
         title: `${verbs[Math.floor(Math.random() * 7)]} ${nouns[Math.floor(Math.random() * 7)]}`,
         prevId,
         userId: user.id,
       }
     })
-    prevId = task.id;
+    prevId = topTask.id;
   }
+
+  await prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      todayTopTaskId: topTask.id
+    }
+  })
 
   console.log(`Database has been seeded. 🌱`);
 }

@@ -23,7 +23,7 @@ export function getTaskListItems({ userId }: { userId: User["id"] }) {
       UNION
       SELECT Task.prevId FROM Task, priority
         WHERE priority.prevId=Task.id
-        LIMIT 3
+        LIMIT 100
     )
     SELECT Task.* FROM priority, Task
       WHERE priority.prevId = Task.id;
